@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Поиск маршрутов</title>
+  </head>
+  <body>
+    <form action="" method="post">
+      <p>{% csrf_token %}</p>
+      <!-- Добавьте поле для URL и кнопку для отправки формы. -->
+      <p>Ввод названия городов в "iata" формате (NYO)</p>
+      Откуда: <input id="L1" name="L1" type="text" />
+      Куда  :<input id="L2" name="L2" type="text" />
+      <button id="submit" name="submit" type="submit">Поиск</button>
+    </form>
+    <!-- Здесь выводите сообщение об ошибке или короткий URL. -->
+    <p>{{ message }}</p>
+    {%block content%}
+      {%for val in url%}
+        <p>{{ val }}</p>
+      {%endfor%}
+    {%endblock%}
+  </body>
+</html>
