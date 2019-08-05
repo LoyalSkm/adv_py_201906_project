@@ -78,17 +78,18 @@ def load_data(path):
                             routes.append(ii[0])
                         di_wizzair.update(dict([[list(code.values())[0], routes]]))
                     em_dict.update(dict([["wizzair", di_wizzair]]))
-                # if fqname == 'airbaltic.json':              #не смог осилить*(
-                #     di_airbaltic = {}                       #почему-то по ключу 'destinations' выдаёт 2 города,
-                #     data = json.load(datafile)              #а в конце ошибку о том что этот ключь отсутствует
-                #     # return(data.keys())
-                #     for f_code in data.values():
-                #         for i in data.keys():
-                #             print(i, list(f_code['destinations'].keys()))
-                #             # di_airbaltic.update([[i, list(f_code['destinations'].keys())]])
-                #         # for routes_f in data.values():
-                #             # print(list(routes_f['destinations'].keys()))
-                #             # routes.append(list(routes_f['destinations'].keys()))
+
+    data = json.load(open('./data/airbaltic.json'))
+    di_airbaltic = {}
+    for k in data:
+        source = data[k]
+
+        if 'destinations' not in source:
+            continue
+
+        dests = [data[dest]['code'] for dest in source['destinations']]
+        di_airbaltic[source['code']] = dests
+        em_dict.update(dict([["airbaltic", di_airbaltic]]))
     return em_dict
 
 def cityes_data(path): #перевод iata в нормальные названия
@@ -107,6 +108,12 @@ def cityes_data(path): #перевод iata в нормальные назван
                     data = json.load(datafile)
                     for i in data:
                         city_data.update({i['iata']: i['shortName']})
+        data = json.load(open('./data/airbaltic.json'))
+        result = {}
+        for k in data:
+            source = data[k]
+            result[source['code']] = source['city']
+            city_data.update(result)
     return city_data
 
 def direct_flight(FROM_R, TO_R):
@@ -122,17 +129,20 @@ def direct_flight(FROM_R, TO_R):
             pass
 
 def transfer_flight (FROM_R, TO_R):
-    em_list = []
     routes_dict = load_data('data')
+    transfer_list = []
     for a in routes_dict:
         for i in routes_dict.values():
             try:
                 for ii in i[FROM_R]:
                     if TO_R in (i[ii]):
-                        em_list.append([a, ii])
+                        transfer_list.append([a, ii])
             except:
                 pass
-    flight = random.choice(em_list)
+    if transfer_list == []:
+        return None
+    else:
+        flight = random.choice(transfer_list)
     return flight
 
 def iata_translater(self):
@@ -142,6 +152,18 @@ def iata_translater(self):
     else:
         pass
 
-def pap():                                         #cписок валидных iata
-    for i in (list(load_data('data').values())):
-        return list(i.keys())
+def pap(): #cписок валидных iata
+    for i in (list(load_data('data'))):
+        em_list = []
+        for ii in (list(load_data('data').values())):
+            em_list.append(list(ii.keys()))
+
+    def flatten(seq):
+        acc = []
+        for e in seq:
+            if type(e) in {list, tuple}:
+                acc.extend(flatten(e))
+            else:
+                acc.append(e)
+        return acc
+    return flatten(em_list)

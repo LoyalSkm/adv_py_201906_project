@@ -46,13 +46,16 @@ def rought_founder(request):
                 em_li_2.append(f"Прямой рейс {json_schema.direct_flight(FROM_R, TO_R)} с {FROM_R}: {json_schema.iata_translater(FROM_R)} "
                                f"--> {TO_R}: {json_schema.iata_translater(TO_R)}")
             else:
-                em_li_2 = f"Прямого рейса нету"
+                em_li_2.append(f"Прямого рейса нету")
             for i in range(2):
                 em_li.append(json_schema.transfer_flight(FROM_R, TO_R))
             for i in em_li:
-                em_li_2.append(f"Рейс с пересадкой {i[0]} с {FROM_R}: {json_schema.iata_translater(FROM_R)} "
-                               f"-->{i[1]}: {json_schema.iata_translater(i[1])} "
-                               f"--> {TO_R}: {json_schema.iata_translater(TO_R)}")
+                if i == None:
+                    em_li_2.append(f"Трансферных рейсов в горож {TO_R} нет")
+                else:
+                    em_li_2.append(f"Рейс с пересадкой {i[0]} с {FROM_R}: {json_schema.iata_translater(FROM_R)} "
+                                   f"-->{i[1]}: {json_schema.iata_translater(i[1])} "
+                                   f"--> {TO_R}: {json_schema.iata_translater(TO_R)}")
             result = em_li_2
             cache.add(result, url)
             context['url'] = result
